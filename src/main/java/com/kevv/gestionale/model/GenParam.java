@@ -3,10 +3,7 @@ package com.kevv.gestionale.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Entity JPA per la tabella gen_param.
- * Rappresenta un parametro generale.
- */
+
 @Entity
 @Table(name = "gen_param")
 @Getter

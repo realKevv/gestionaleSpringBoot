@@ -23,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     // Se vuoi un metodo che ritorna solo gli userid come stringhe
     @Query("SELECT u.userid FROM User u")
     List<String> findAllUserIds();
+
+
+
 }

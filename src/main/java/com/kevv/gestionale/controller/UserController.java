@@ -82,17 +82,23 @@ public class UserController {
     }
 
     @PutMapping("/resetLogin/{userid}")
-    @Transactional // Aggiunto @Transactional se la logica di reset coinvolge più operazioni DB
-    private ResponseEntity<String> resetLogin(@PathVariable String userid) {
+    @Transactional
+    public ResponseEntity<String> resetLogin(@PathVariable String userid) { // Rendi pubblico se chiamato esternamente
+        Optional<User> optionalUser = userRepository.findById(userid);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato con ID: " + userid);
+        }
+
         try {
-            User user = userRepository.findById(userid)
-                    .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+            User user = optionalUser.get();
             user.setIsLogged(false);
             userRepository.save(user);
-            return ResponseEntity.ok("Login resettato con successo");
-        } catch (RuntimeException e) {
+            return ResponseEntity.ok("Login resettato con successo per utente: " + userid);
+        } catch (Exception e) {
+            System.err.println("Errore interno durante il reset login per " + userid + ": " + e.getMessage());
+            e.printStackTrace(); 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore durante il reset login: " + e.getMessage()); // Dettaglio l'errore
+                    .body("Errore interno del server durante il reset login per " + userid + ": " + e.getMessage());
         }
     }
 

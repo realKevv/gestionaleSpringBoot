@@ -3,6 +3,8 @@ package com.kevv.gestionale.controller;
 import com.kevv.gestionale.model.Company;
 import com.kevv.gestionale.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,5 +40,13 @@ public class CompanyController {
                 .orElseThrow(() -> new RuntimeException("Azienda non trovata con compid: " + compid));
     }
 
-
+    @PostMapping
+    public ResponseEntity<Company> createNewCompany(@RequestBody Company newCompany) {
+        if (newCompany.getCompid() != null && companyRepository.existsById(newCompany.getCompid())) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        Company savedCompany = companyRepository.save(newCompany);
+        return new ResponseEntity<>(savedCompany, HttpStatus.CREATED);
+    }
 }
+

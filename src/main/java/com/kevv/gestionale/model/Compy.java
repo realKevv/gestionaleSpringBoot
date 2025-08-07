@@ -35,11 +35,11 @@ public class Compy implements Serializable {
     private List<UserCompy> userCompies = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("comp")
-    @JoinColumn(name = "comp", referencedColumnName = "compid")
+    // RIMOSSO: @MapsId("comp") <-- QUESTA ERA LA CAUSA DELL'ERRORE!
+    @JoinColumn(name = "comp", referencedColumnName = "compid", insertable = false, updatable = false) // 'comp' in compy si riferisce a 'compid' in company
     @ToString.Exclude
     @JsonIgnore
-    private Company company;
+    private Company company; // L'oggetto Company associato
 
     // Getter di convenienza per accedere ai campi dell'ID
     public String getComp() {

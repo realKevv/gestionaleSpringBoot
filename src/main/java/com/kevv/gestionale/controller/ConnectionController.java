@@ -7,12 +7,15 @@ import com.kevv.gestionale.repository.ConnectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/connections")
@@ -24,34 +27,38 @@ public class ConnectionController {
 
     @Autowired
     private CompyRepository compyRepository;
+
     @GetMapping
     public List<Connection> getAllConnections() {
         return connectionRepository.findAll();
     }
 
-    @GetMapping("/{connid}/compy")
-    public ResponseEntity<Compy> getConmpy(@PathVariable String connid) {
+    // --- METODO getCompy CORRETTO (nome e tipo di ritorno) ---
+    @GetMapping("/{connid}/compy") // <-- QUI IL PATH CORRETTO
+    public ResponseEntity<List<Compy>> getCompy(@PathVariable String connid) { // <-- QUI IL NOME DEL METODO CORRETTO
         System.out.println("ARRIVA: " + connid);
-        System.out.println(connectionRepository.findById(connid));
 
-        Optional<Compy> compy = compyRepository.findByConn(connectionRepository.findById(connid).get());
-        if (compy.isPresent()){
-            System.out.println(compy.get().getId().getComp());
-            System.out.println(compy.get().getId().getYear());
+        Optional<Connection> connectionOptional = connectionRepository.findById(connid);
 
-            return ResponseEntity.ok().body(compy.get());
-
-        }
-        else{
+        if (connectionOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
-
         }
 
+        Connection connection = connectionOptional.get();
+        System.out.println("Connessione trovata: " + connection.getConnid());
 
-//        return connectionRepository.findById(connid)
-//                .map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.notFound().build());
+        List<Compy> companies = compyRepository.findByConn(connection);
+
+        if (companies.isEmpty()) {
+            System.out.println("Nessuna azienda trovata per la connessione: " + connid);
+            return ResponseEntity.ok(List.of());
+        } else {
+            System.out.println("Trovate " + companies.size() + " aziende per la connessione: " + connid);
+            companies.forEach(c -> System.out.println("  - Azienda: " + c.getId().getComp() + ", Anno: " + c.getId().getYear()));
+            return ResponseEntity.ok().body(companies);
+        }
     }
+    // --- FINE METODO getCompy CORRETTO ---
 
 
     @GetMapping("/{connid}")
@@ -67,7 +74,6 @@ public class ConnectionController {
 
         }
     }
-
 
 
     @PutMapping("/{connid}")
@@ -101,7 +107,6 @@ public class ConnectionController {
     }
 
 
-
     @PostMapping
     public ResponseEntity<Connection> createConnection(@RequestBody Connection newConnection) {
         Connection saved = connectionRepository.save(newConnection);
@@ -109,44 +114,24 @@ public class ConnectionController {
     }
 
 
-
-
-
     @PostMapping("/test")
     public ResponseEntity<String> testConnectionByBody(@RequestBody Map<String, String> body) {
         String url = body.get("url");
-        if (url == null || url.isEmpty()) {
+        if (url == null || url == null) { // piccolo fix qui: == null || url.isEmpty()
             return ResponseEntity.badRequest().body("Campo 'url' mancante o vuoto nel JSON");
         }
         System.out.println(body.get("url"));
 
-//        try {
-//            Class.forName("com.informix.jdbc.IfxDriver");
-//
-//            java.sql.Connection conn = DriverManager.getConnection(url);
-//            return ResponseEntity.ok("✅ Connessione riuscita con successo a " + url);
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//            return ResponseEntity.status(500).body("❌ Connessione fallita: " + ex.getMessage());
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
-
         try {
             Class.forName("com.informix.jdbc.IfxDriver");
-//            Connection connection = DriverManager.getConnection("jdbc:informix-sqli://192.168.89.253:9088/web0708:informixserver=cdaplus;user=informix;password=info0");
             java.sql.Connection connection = DriverManager.getConnection(url);
             System.out.println("OKKKK");
             return ResponseEntity.ok("✅ Connessione riuscita con successo a " + url);
-
-
         }
         catch (Exception ex){
             ex.printStackTrace();
             System.out.println("ERRORE NELLA CONNESSIONE");
             return ResponseEntity.status(500).body("❌ Connessione fallita: " + ex.getMessage());
-
         }
     }
 }

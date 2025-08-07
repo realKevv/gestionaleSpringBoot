@@ -14,8 +14,7 @@ import java.util.Optional;
 @Repository
 public interface CompyRepository extends JpaRepository<Compy, CompyId> {
 
-    Optional<Compy> findByConn(Connection conn);
+    List<Compy> findByConn(Connection conn);
 
-    // QUESTO È IL METODO CORRETTO per cercare per la parte 'comp' della chiave composita
-    List<Compy> findById_Comp(String compId); // <-- **USA QUESTO NOME DI METODO**
+    List<Compy> findById_Comp(String compId);
 }
