@@ -1,33 +1,38 @@
 package com.kevv.gestionale.model;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "applmenu_users_in")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-
+@IdClass(ApplMenuUserKeyId.class)
 
 public class ApplMenuUserIn {
 
-    @EmbeddedId
-    private ApplMenuUserKeyId id;
+    @Id
+    @Column(length = 15)
+    private String applmenu;
 
+    @Id
+    @Column(length = 15)
+    private String user;
 
-    @ManyToOne
-    @MapsId("applmenu")
-    @JoinColumn( name = "applmenu", referencedColumnName = "code")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applmenu", insertable = false, updatable = false)
     private ApplMenu applMenu;
 
-    @ManyToOne
-    @MapsId("user")
-    @JoinColumn(name = "user", referencedColumnName = "userid")
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user", insertable = false, updatable = false)
+    private User userEntity;
 
-
+    // Costruttore custom che accetta le entità e setta anche le chiavi (utile in controller)
+    public ApplMenuUserIn(ApplMenu applMenu, User userEntity) {
+        this.applmenu = applMenu.getCode();
+        this.user = userEntity.getUserid();
+        this.applMenu = applMenu;
+        this.userEntity = userEntity;
+    }
 }

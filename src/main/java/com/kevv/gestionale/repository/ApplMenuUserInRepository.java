@@ -9,9 +9,10 @@ import java.util.List;
 
 
 @Repository
+
 public interface ApplMenuUserInRepository extends JpaRepository<ApplMenuUserIn, ApplMenuUserKeyId> {
 
-    List<ApplMenuUserIn> findByUserUserid(String userid);
+    List<ApplMenuUserIn> findByUser(String user);
 
-    List<ApplMenuUserIn> findByApplMenuCode(String applMenuCode);
+    List<ApplMenuUserIn> findByApplmenu(String applmenu);
 }
