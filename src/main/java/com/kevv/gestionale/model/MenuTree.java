@@ -1,30 +1,27 @@
 package com.kevv.gestionale.model;
 
-
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "menu_tree")
-@Data
-
+@Getter
+@Setter
 public class MenuTree {
 
     @EmbeddedId
     private MenuTreeId id;
 
-    private short row;
+    @Column(name = "row", nullable = false)
+    private int row = 1;
 
-    private short col;
+    @Column(name = "col", nullable = false)
+    private int col = 1;
 
-    private boolean ismain;
+    @Column(name = "ismain", nullable = false)
+    private boolean isMain = false;
 
+    @Transient
+    private boolean Folder;
 }
-
-
-
-
-
-

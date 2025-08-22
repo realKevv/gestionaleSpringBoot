@@ -1,22 +1,17 @@
 package com.kevv.gestionale.model;
 
-
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Embeddable
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-
-
+@Getter
+@Setter
 public class MenuTreeId implements Serializable {
 
     @ManyToOne
@@ -27,6 +22,17 @@ public class MenuTreeId implements Serializable {
     @JoinColumn(name = "parent", referencedColumnName = "code")
     private ApplMenu parent;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MenuTreeId)) return false;
+        MenuTreeId that = (MenuTreeId) o;
+        return Objects.equals(applmenu, that.applmenu) &&
+                Objects.equals(parent, that.parent);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(applmenu, parent);
+    }
 }
-
